@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ReactModal from "react-modal";
-import Calendar from "./components/Calendar";
+import Calender from "./components/Calender"; 
 import EventModal from "./components/EventModal";
 import EventList from "./components/EventList";
 import { getFormattedDate } from "./utils/date";
 import { saveToLocalStorage, loadFromLocalStorage } from "./utils/storage";
-import { format, addMonths, subMonths } from "date-fns";
+import { format, addMonths, subMonths } from "date-fns"; 
 
 const App = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -23,6 +23,11 @@ const App = () => {
   useEffect(() => {
     saveToLocalStorage("events", events);
   }, [events]);
+
+  const handleDayClick = (date) => {
+    setSelectedDate(date);
+    setShowModal(true); // Open the modal only when a date is selected
+  };
 
   const handleSaveEvent = (eventDetails) => {
     const dateKey = getFormattedDate(selectedDate);
@@ -42,7 +47,7 @@ const App = () => {
       ...events,
       [dateKey]: [...eventList, eventDetails],
     });
-    setShowModal(false);
+    setShowModal(false); 
   };
 
   const handleDeleteEvent = (dateKey, index) => {
@@ -51,41 +56,29 @@ const App = () => {
     setEvents({ ...events, [dateKey]: eventList });
   };
 
-  const handleDragEnd = (event, oldDateKey, index) => {
-    const newDateKey = event.target.dataset.dateKey;
-    if (newDateKey && newDateKey !== oldDateKey) {
-      const eventList = [...(events[oldDateKey] || [])];
-      const [draggedEvent] = eventList.splice(index, 1);
-      setEvents({
-        ...events,
-        [oldDateKey]: eventList,
-        [newDateKey]: [...(events[newDateKey] || []), draggedEvent],
-      });
-    }
-  };
-
   const handleMonthChange = (direction) => {
     setCurrentMonth((prevMonth) =>
       direction === "next" ? addMonths(prevMonth, 1) : subMonths(prevMonth, 1)
     );
   };
 
-  const exportEvents = (format) => {
+  const exportEvents = (formatType) => {
     const monthEvents = Object.entries(events)
       .filter(([date]) =>
         format(currentMonth, "yyyy-MM") === date.substring(0, 7)
       )
       .map(([date, eventList]) => ({ date, events: eventList }));
 
-    const data = format === "csv" ? convertToCSV(monthEvents) : JSON.stringify(monthEvents, null, 2);
+    const data =
+      formatType === "csv" ? convertToCSV(monthEvents) : JSON.stringify(monthEvents, null, 2);
 
     const blob = new Blob([data], {
-      type: format === "csv" ? "text/csv" : "application/json",
+      type: formatType === "csv" ? "text/csv" : "application/json",
     });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `events.${format}`;
+    link.download = `events.${formatType}`; // Fixed template literal error 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -132,9 +125,9 @@ const App = () => {
         </button>
       </div>
 
-      <Calendar
+      <Calender
         currentMonth={currentMonth}
-        onDayClick={setSelectedDate}
+        onDayClick={handleDayClick} 
         selectedDate={selectedDate}
         events={events}
       />
@@ -145,7 +138,6 @@ const App = () => {
           onDelete={(index) =>
             handleDeleteEvent(getFormattedDate(selectedDate), index)
           }
-          onDragEnd={handleDragEnd}
         />
       )}
 
@@ -164,12 +156,13 @@ const App = () => {
         </button>
       </div>
 
-      <EventModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSave={handleSaveEvent}
-        existingEvent={null}
-      />
+      {showModal && (
+        <EventModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)} 
+          onSave={handleSaveEvent}
+        />
+      )}
     </div>
   );
 };
