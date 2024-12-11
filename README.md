@@ -1,70 +1,70 @@
-# Getting Started with Create React App
+# Evenzaa
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Deployed App
+[Evenzaa](https://evenzaa.netlify.app/)
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Features in Detail
 
-### `npm start`
+### **Calendar View**
+- Displays the current month by default.
+- Navigation buttons allow switching between months.
+- Dates are clickable to open the Event Modal for adding events.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### **Event Management**
+- Clicking on a date opens a modal where users can add event details.
+- Each event requires a name and start/end time; a description is optional.
+- Users can edit or delete events for any selected date.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### **Event List**
+- A detailed list of events for the selected day is shown in a modal, making it easy to manage and review events.
 
-### `npm test`
+### **Data Persistence**
+- All events are saved in the browser's `localStorage` to ensure they persist across page reloads.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### **Bonus Features**
+1. **Drag-and-Drop**: Users can reschedule events by dragging them between days.
+2. **Color Coding**: Events are categorized (work, personal, others) and color-coded for better visualization.
+3. **Export Events**:
+   - JSON: Exports all events for the current month as a `.json` file.
+   - CSV: Exports all events for the current month as a `.csv` file.
+---
 
-### `npm run build`
+## Instructions to Run the App Locally
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
+Make sure you have the following installed:
+- [Node.js](https://nodejs.org/) (v14 or later)
+- npm (Node Package Manager, included with Node.js)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Steps
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Vipul-Mhatre/Evenzaa.git
+   cd Evenzaa
+   ```
 
-### `npm run eject`
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. **Start the Development Server**
+   ```bash
+   npm start
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   The app will be available at `http://localhost:3000` in your browser.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+4. **Optional**: To build the app for production:
+   ```bash
+   npm run build
+   ```
+   This creates a production-ready build in the `build/` directory.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Contribution
+Feel free to fork the repository and submit a pull request for new features, bug fixes, or enhancements!

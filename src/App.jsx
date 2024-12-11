@@ -110,19 +110,20 @@ const App = () => {
       />
 
       <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={() => handleMonthChange("prev")}
-          className="bg-gray-200 text-gray-700 p-2 rounded"
-        >
-          Previous
-        </button>
+      <button
+  onClick={() => handleMonthChange("prev")}
+  className="bg-violet-500 text-white p-2 rounded"
+>
+  Previous
+</button>
+
         <h2 className="text-lg font-semibold">{format(currentMonth, "MMMM yyyy")}</h2>
         <button
           onClick={() => handleMonthChange("next")}
-          className="bg-gray-200 text-gray-700 p-2 rounded"
-        >
-          Next
-        </button>
+  className="bg-violet-500 text-white p-2 rounded"
+>
+Next
+</button>
       </div>
 
       <Calender
