@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactModal from "react-modal";
-import Calendar from "./components/Calender";
+import Calendar from "./components/Calendar";
 import EventModal from "./components/EventModal";
 import EventList from "./components/EventList";
 import { getFormattedDate } from "./utils/date";
@@ -8,25 +8,22 @@ import { saveToLocalStorage, loadFromLocalStorage } from "./utils/storage";
 import { format, addMonths, subMonths } from "date-fns";
 
 const App = () => {
-  const [selectedDate, setSelectedDate] = useState(null);  // Currently selected date
+  const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
-  const [currentMonth, setCurrentMonth] = useState(new Date());  // Current month state
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Load events from local storage on component mount
   useEffect(() => {
-    ReactModal.setAppElement('#root');
+    ReactModal.setAppElement("#root");
     const loadedEvents = loadFromLocalStorage("events");
     setEvents(loadedEvents || {});
   }, []);
 
-  // Save events to local storage whenever they change
   useEffect(() => {
     saveToLocalStorage("events", events);
   }, [events]);
 
-  // Save new event for the selected date
   const handleSaveEvent = (eventDetails) => {
     const dateKey = getFormattedDate(selectedDate);
     const eventList = events[dateKey] || [];
@@ -41,37 +38,76 @@ const App = () => {
       return;
     }
 
-    // Save the event
     setEvents({
       ...events,
       [dateKey]: [...eventList, eventDetails],
     });
-    setShowModal(false);  // Close modal after saving event
+    setShowModal(false);
   };
 
-  // Filter events based on search input
-  const filteredEvents = Object.entries(events).filter(([date, eventList]) =>
-    eventList.some((event) =>
-      event.name.toLowerCase().includes(search.toLowerCase())
-    )
-  );
+  const handleDeleteEvent = (dateKey, index) => {
+    const eventList = [...(events[dateKey] || [])];
+    eventList.splice(index, 1);
+    setEvents({ ...events, [dateKey]: eventList });
+  };
 
-  // Change the current month (next or previous month)
+  const handleDragEnd = (event, oldDateKey, index) => {
+    const newDateKey = event.target.dataset.dateKey;
+    if (newDateKey && newDateKey !== oldDateKey) {
+      const eventList = [...(events[oldDateKey] || [])];
+      const [draggedEvent] = eventList.splice(index, 1);
+      setEvents({
+        ...events,
+        [oldDateKey]: eventList,
+        [newDateKey]: [...(events[newDateKey] || []), draggedEvent],
+      });
+    }
+  };
+
   const handleMonthChange = (direction) => {
     setCurrentMonth((prevMonth) =>
       direction === "next" ? addMonths(prevMonth, 1) : subMonths(prevMonth, 1)
     );
   };
 
-  // Handle day click
-  const handleDayClick = (day) => {
-    setSelectedDate(day);
-    setShowModal(true);  // Show modal when a day is clicked
+  const exportEvents = (format) => {
+    const monthEvents = Object.entries(events)
+      .filter(([date]) =>
+        format(currentMonth, "yyyy-MM") === date.substring(0, 7)
+      )
+      .map(([date, eventList]) => ({ date, events: eventList }));
+
+    const data = format === "csv" ? convertToCSV(monthEvents) : JSON.stringify(monthEvents, null, 2);
+
+    const blob = new Blob([data], {
+      type: format === "csv" ? "text/csv" : "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `events.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const convertToCSV = (data) => {
+    const headers = ["Date", "Event Name", "Start Time", "End Time", "Description"];
+    const rows = data.flatMap(({ date, events }) =>
+      events.map((event) => [
+        date,
+        event.name,
+        event.startTime,
+        event.endTime,
+        event.description,
+      ])
+    );
+
+    return [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {/* Search Input */}
       <input
         type="text"
         placeholder="Search events"
@@ -80,19 +116,6 @@ const App = () => {
         className="border rounded w-full p-2 mb-4"
       />
 
-      {/* Filtered Events Display */}
-      {filteredEvents.map(([date, eventList]) => (
-        <div key={date} className="mb-4">
-          <h4 className="font-semibold text-lg">{date}</h4>
-          {eventList.map((event, index) => (
-            <p key={index} className="text-sm text-gray-700">
-              {event.name}
-            </p>
-          ))}
-        </div>
-      ))}
-
-      {/* Month Navigation */}
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => handleMonthChange("prev")}
@@ -109,20 +132,43 @@ const App = () => {
         </button>
       </div>
 
-      {/* Calendar component */}
       <Calendar
-        currentMonth={currentMonth}  // Pass current month to calendar
-        onDayClick={handleDayClick}  // Handle day click
-        selectedDate={selectedDate}  // Highlight selected date
-        events={events}  // Pass events to Calendar
+        currentMonth={currentMonth}
+        onDayClick={setSelectedDate}
+        selectedDate={selectedDate}
+        events={events}
       />
 
-      {/* Event Modal */}
+      {selectedDate && (
+        <EventList
+          events={events[getFormattedDate(selectedDate)] || []}
+          onDelete={(index) =>
+            handleDeleteEvent(getFormattedDate(selectedDate), index)
+          }
+          onDragEnd={handleDragEnd}
+        />
+      )}
+
+      <div className="flex space-x-2 mt-4">
+        <button
+          onClick={() => exportEvents("json")}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Export JSON
+        </button>
+        <button
+          onClick={() => exportEvents("csv")}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Export CSV
+        </button>
+      </div>
+
       <EventModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleSaveEvent}
-        existingEvent={null}  // Existing event is null since we're adding a new one
+        existingEvent={null}
       />
     </div>
   );
